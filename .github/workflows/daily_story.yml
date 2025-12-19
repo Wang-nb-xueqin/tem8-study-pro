@@ -1,0 +1,28 @@
+name: Daily English Story
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每天北京时间早上 8 点运行
+  workflow_dispatch: # 允许你手动点击运行
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install openai pandas
+      - name: Run Generator
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: python update_story.py
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add index.html
+          git commit -m "Update daily story" || echo "No changes to commit"
+          git push
