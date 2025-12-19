@@ -3,38 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEM8 词汇实验室</title>
+    <title>TEM8 Master - Wang-nb-xueqin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
-        body { font-family: 'Noto Serif SC', serif; background-color: #fcfaf2; color: #333; }
-        .word-highlight { border-bottom: 2px solid #d4a017; cursor: pointer; transition: all 0.2s; }
-        .word-highlight:hover { background-color: #f3e5ab; }
-        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        body { background-color: #f8f9fa; font-family: 'Noto Serif SC', 'Georgia', serif; }
+        .paper { background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-radius: 12px; min-height: 300px; }
+        .word { border-bottom: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s; font-weight: 600; color: #1a202c; padding: 0 2px; }
+        .word:hover { border-bottom-color: #fbbf24; background-color: #fffbeb; }
+        #popup { display: none; position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); padding: 24px; z-index: 100; border: 1px solid #eee; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1); z-index: 90; }
     </style>
 </head>
-<body class="min-h-screen py-12 px-4">
+<body class="py-10 px-4">
     <div class="max-w-2xl mx-auto">
-        <header class="text-center mb-12">
-            <h1 class="text-3xl font-bold text-gray-800">TEM-8 Vocabulary Master</h1>
-            <p class="text-gray-500 mt-2">每日浸润式阅读 · 智能难词追踪</p>
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight">TEM-8 Reading Lab</h1>
+            <p class="text-gray-500 mt-2 text-sm italic">Hello, Wang-nb-xueqin. Happy learning.</p>
         </header>
-
-        <main class="bg-white p-8 md:p-12 rounded-2xl card-shadow leading-loose text-lg text-gray-700">
-            <div id="story-content">
-                正在为你加载今日专八故事...
+        
+        <div class="paper p-8 text-lg leading-relaxed text-gray-700 mb-6 relative">
+            <div class="text-center py-10">
+                <p class="text-gray-400">正在等待机器人生成今日第一篇专八故事...</p>
+                <p class="text-xs text-gray-300 mt-2">（初次运行请在 Actions 页面手动触发一次）</p>
             </div>
-        </main>
-
-        <div id="word-card" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 w-80 bg-white p-6 rounded-2xl shadow-2xl border border-gold-200 z-50">
-            <div class="flex justify-between items-start mb-4">
-                <h2 id="card-word" class="text-2xl font-bold text-yellow-700">Word</h2>
-                <span id="card-phonetic" class="text-gray-400 font-mono">/phonetic/</span>
             </div>
-            <p id="card-en" class="text-sm text-gray-600 italic mb-2"></p>
-            <p id="card-cn" class="text-base text-gray-800 font-medium"></p>
-            <button onclick="closeCard()" class="mt-4 w-full py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm transition">关闭</button>
+
+        <div id="stats" class="text-xs text-gray-400 text-center uppercase tracking-widest">
+            点击单词查看释义 • 自动追踪难词次数
         </div>
     </div>
+
+    <div class="overlay" id="overlay" onclick="closeCard()"></div>
+
+    <div id="popup">
+        <div class="flex justify-between items-center mb-2">
+            <h2 id="p-word" class="text-2xl font-bold text-yellow-700">Word</h2>
+            <span id="p-count" class="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full font-bold">查询 0 次</span>
+        </div>
+        <p id="p-phonetic" class="text-gray-400 mb-4 font-mono">/phonetic/</p>
+        <div class="space-y-3 border-t pt-4">
+            <p id="p-en" class="text-gray-600 italic text-sm leading-snug"></p>
+            <p id="p-cn" class="text-lg font-medium text-gray-800"></p>
+        </div>
+        <button onclick="closeCard()" class="mt-6 w-full bg-gray-900 text-white py-3 rounded-xl text-sm font-bold active:scale-95 transition">我知道了</button>
+    </div>
+
+    <script>
+        function clickWord(w, p, en, cn) {
+            // 1. 记录点击次数
+            let count = localStorage.getItem(w) || 0;
+            count = parseInt(count) + 1;
+            localStorage.setItem(w, count);
+
+            // 2. 显示弹窗和遮罩
+            document.getElementById('p-word').innerText = w;
+            document.getElementById('p-phonetic').innerText = p;
+            document.getElementById('p-en').innerText = en;
+            document.getElementById('p-cn').innerText = cn;
+            document.getElementById('p-count').innerText = `查询 ${count} 次`;
+            
+            document.getElementById('popup').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function closeCard() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
