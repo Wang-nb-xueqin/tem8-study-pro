@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEM8 词汇实验室</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+        body { font-family: 'Noto Serif SC', serif; background-color: #fcfaf2; color: #333; }
+        .word-highlight { border-bottom: 2px solid #d4a017; cursor: pointer; transition: all 0.2s; }
+        .word-highlight:hover { background-color: #f3e5ab; }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen py-12 px-4">
+    <div class="max-w-2xl mx-auto">
+        <header class="text-center mb-12">
+            <h1 class="text-3xl font-bold text-gray-800">TEM-8 Vocabulary Master</h1>
+            <p class="text-gray-500 mt-2">每日浸润式阅读 · 智能难词追踪</p>
+        </header>
+
+        <main class="bg-white p-8 md:p-12 rounded-2xl card-shadow leading-loose text-lg text-gray-700">
+            <div id="story-content">
+                正在为你加载今日专八故事...
+            </div>
+        </main>
+
+        <div id="word-card" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 w-80 bg-white p-6 rounded-2xl shadow-2xl border border-gold-200 z-50">
+            <div class="flex justify-between items-start mb-4">
+                <h2 id="card-word" class="text-2xl font-bold text-yellow-700">Word</h2>
+                <span id="card-phonetic" class="text-gray-400 font-mono">/phonetic/</span>
+            </div>
+            <p id="card-en" class="text-sm text-gray-600 italic mb-2"></p>
+            <p id="card-cn" class="text-base text-gray-800 font-medium"></p>
+            <button onclick="closeCard()" class="mt-4 w-full py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm transition">关闭</button>
+        </div>
+    </div>
+</body>
+</html>
