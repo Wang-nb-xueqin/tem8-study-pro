@@ -23,9 +23,14 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          # 先拉取最新的远程更改，避免冲突
-          git pull --rebase origin main
+          # 1. 强制放弃所有本地冲突，以远程为准
+          git fetch origin main
+          git reset --hard origin main
+          
+          # 2. 重新运行你的脚本生成故事（确保内容是最新的）
+          python update_story.py
+          
+          # 3. 提交并强制推送
           git add index.html
           git commit -m "Update daily story" || echo "No changes to commit"
-          # 强制推送到 main 分支
-          git push origin main
+          git push origin main --force
