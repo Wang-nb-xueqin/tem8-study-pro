@@ -1,37 +1,46 @@
 import os
+import re
 from openai import OpenAI
 
-client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com")
+client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="[https://api.deepseek.com](https://api.deepseek.com)")
 
-# 换一组更有难度的专八词汇
-words = "superfluous, exacerbate, pragmatic, ephemeral, meticulous"
+# 自动更新专八难词
+words = "superfluous, exacerbate, pragmatic, ephemeral, meticulous, precarious, ubiquitous"
 
-# 极严格的指令
 prompt = f"""
-Write a professional, high-quality short story in ENGLISH (about 200 words) for a TEM-8 student.
-Vocabulary to include: {words}.
+Write a 200-word news article or essay in English. 
+Style: The Economist / The New Yorker. 
+Target Words: {words}.
 
-IMPORTANT RULES:
-1. The story must be in ENGLISH.
-2. Format each target word EXACTLY like this: <span class="word" onclick="clickWord('Word', 'Phonetic', 'English Meaning', '中文释义')">Word</span>.
-3. Replace 'Word', 'Phonetic', 'English Meaning', '中文释义' with the real data for each word.
-4. Use a sophisticated, literary style (New Yorker style).
+REQUIRED FORMAT:
+For each target word, you MUST use this HTML tag: <span class="word" onclick="clickWord('Word', 'Phonetic', 'English Meaning', '中文释义')">Word</span>.
+Do NOT use Markdown. Do NOT use ```html blocks.
+The output should only be the story content with HTML tags.
 """
 
-response = client.chat.completions.create(
-    model="deepseek-chat",
-    messages=[{"role": "user", "content": prompt}]
-)
+try:
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7
+    )
+    
+    story_html = response.choices[0].message.content
+    # 清洗掉可能出现的 Markdown 代码块标记
+    story_html = story_html.replace("```html", "").replace("```", "").strip()
 
-story_html = response.choices[0].message.content
+    with open("index.html", "r", encoding="utf-8") as f:
+        content = f.read()
 
-with open("index.html", "r", encoding="utf-8") as f:
-    content = f.read()
+    # 精准替换
+    pattern = r'.*?'
+    replacement = f'\n{story_html}\n'
+    new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
 
-import re
-new_content = re.sub(r'.*?', 
-                     f'\n<div class="story-fade-in">{story_html}</div>\n', 
-                     content, flags=re.DOTALL)
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(new_content)
+    print("Successfully updated the story!")
 
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(new_content)
+except Exception as e:
+    print(f"Error: {e}")
+
