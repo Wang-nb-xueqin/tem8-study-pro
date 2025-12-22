@@ -1,36 +1,38 @@
 name: Daily English Story
 on:
   schedule:
-    - cron: '0 0 * * *' # 每天北京时间早上 8 点运行
-  workflow_dispatch: # 允许你手动点击运行
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # 获取完整历史，方便推送
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+
       - name: Install dependencies
         run: pip install openai pandas
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
       - name: Run Generator
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: python update_story.py
-      - name: Commit changes
+
+      - name: Push changes
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          # 1. 强制放弃所有本地冲突，以远程为准
-          git fetch origin main
-          git reset --hard origin main
-          
-          # 2. 重新运行你的脚本生成故事（确保内容是最新的）
-          python update_story.py
-          
-          # 3. 提交并强制推送
           git add index.html
-          git commit -m "Update daily story" || echo "No changes to commit"
+          git commit -m "Update daily story" || exit 0
+          # 使用 --force 强制推送，解决一切冲突
           git push origin main --force
