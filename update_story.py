@@ -32,15 +32,21 @@ try:
     with open("index.html", "r", encoding="utf-8") as f:
         content = f.read()
 
-    # 精准替换
+   # 这段代码会更加智能地寻找标记，无论它们中间有多少空格
+    import re
+    
+    # 查找标记及其之间的任何内容（包含换行符）
     pattern = r'.*?'
     replacement = f'\n{story_html}\n'
-    new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
-
-    with open("index.html", "w", encoding="utf-8") as f:
-        f.write(new_content)
-    print("Successfully updated the story!")
-
-except Exception as e:
-    print(f"Error: {e}")
+    
+    # 检查内容里到底有没有这两个标记
+    if "STORY_START" in content and "STORY_END" in content:
+        new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+        with open("index.html", "w", encoding="utf-8") as f:
+            f.write(new_content)
+        print("Success: Story replaced!")
+    else:
+        print("Error: Could not find STORY_START or STORY_END markers in index.html")
+        # 如果找不到，脚本会报错，你会看到 Actions 变红，我们就知道问题在哪了
+        exit(1)
 
