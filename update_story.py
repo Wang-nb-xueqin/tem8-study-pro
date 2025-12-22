@@ -1,14 +1,22 @@
 import os
 from openai import OpenAI
 
-# 1. 连通 AI
 client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com")
 
-# 2. 这里的单词列表你可以之后改成读取 data.json
-words = "abide, abrupt, alleviate, ambiguous, analogous" 
+# 换一组更有难度的专八词汇
+words = "superfluous, exacerbate, pragmatic, ephemeral, meticulous"
 
-# 3. 让 AI 生成故事
-prompt = f"请用以下专八单词写一个300字故事，要求单词加粗，并使用 <span class='word' onclick='clickWord(...)'>单词</span> 格式包裹。单词列表：{words}"
+# 极严格的指令
+prompt = f"""
+Write a professional, high-quality short story in ENGLISH (about 200 words) for a TEM-8 student.
+Vocabulary to include: {words}.
+
+IMPORTANT RULES:
+1. The story must be in ENGLISH.
+2. Format each target word EXACTLY like this: <span class="word" onclick="clickWord('Word', 'Phonetic', 'English Meaning', '中文释义')">Word</span>.
+3. Replace 'Word', 'Phonetic', 'English Meaning', '中文释义' with the real data for each word.
+4. Use a sophisticated, literary style (New Yorker style).
+"""
 
 response = client.chat.completions.create(
     model="deepseek-chat",
@@ -17,14 +25,12 @@ response = client.chat.completions.create(
 
 story_html = response.choices[0].message.content
 
-# 4. 自动替换 index.html 里的内容
 with open("index.html", "r", encoding="utf-8") as f:
     content = f.read()
 
-# 假设你在 index.html 里用了 作为标记
 import re
 new_content = re.sub(r'.*?', 
-                     f'{story_html}', 
+                     f'\n<div class="story-fade-in">{story_html}</div>\n', 
                      content, flags=re.DOTALL)
 
 with open("index.html", "w", encoding="utf-8") as f:
