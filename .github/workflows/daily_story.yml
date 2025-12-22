@@ -23,6 +23,9 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          # 先拉取最新的远程更改，避免冲突
+          git pull --rebase origin main
           git add index.html
           git commit -m "Update daily story" || echo "No changes to commit"
-          git push
+          # 强制推送到 main 分支
+          git push origin main
